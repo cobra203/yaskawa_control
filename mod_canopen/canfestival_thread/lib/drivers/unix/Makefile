@@ -1,0 +1,3 @@
+EXTRA_CFLAGS := -D DEBUG -DNOT_USE_DYNAMIC_LOADING
+
+obj-y += unix.o
