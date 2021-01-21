@@ -1,5 +1,5 @@
 /*
-This file is part of CanFestival, a library implementing CanOpen Stack. 
+This file is part of CanFestival, a library implementing CanOpen Stack.
 
 Copyright (C): Edouard TISSERANT and Francis DUPIN
 
@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <linux/types.h>
 #endif
 
+#include <cobra_console.h>
 /*  Define the architecture : little_endian or big_endian
  -----------------------------------------------------
  Test :
@@ -74,6 +75,43 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define REAL32	float
 #define REAL64 double
 
+/* Add cobra console debug macros */
+#ifdef __COBRA_CONSOLE__
+
+#if (LOG_CAN_LEVEL > LOG_LEVEL_NOT)
+#define MSG_DUMP_START()	console_cmdline_clean();console("CAN      : ");
+#define MSG_DUMP_END()		console_cmdline_restore()
+#define MSG_DUMP(fm, ...)	console(fm, ##__VA_ARGS__)
+#else
+#define MSG_DUMP_START()
+#define MSG_DUMP_END()
+#define MSG_DUMP(fm, ...)
+#endif
+
+#if (LOG_CAN_LEVEL > LOG_LEVEL_NOT)
+#define CAN_INFO(fm, ...) { \
+	console_cmdline_clean(); \
+	console("CAN      : " fm, ##__VA_ARGS__); \
+	console_cmdline_restore(); \
+}
+#else
+#define CAN_INFO(fm, ...)
+#endif
+
+#if (LOG_CAN_LEVEL > LOG_LEVEL_INFO)
+#define CAN_DEBUG(fm, ...) { \
+	console_cmdline_clean(); \
+	console("CAN      : " fm, ##__VA_ARGS__); \
+	console_cmdline_restore(); \
+}
+#else
+#define CAN_DEBUG(fm, ...)
+#endif
+
+#define CAN_LOG(level, fm, ...) CAN_##level(fm, ##__VA_ARGS__)
+
+#endif
+
 /* Definition of error and warning macros */
 /* -------------------------------------- */
 #ifdef __KERNEL__
@@ -84,7 +122,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #	define MSG(...)
 #else
 #	include <stdio.h>
+#ifdef __COBRA_CONSOLE__
+#	define MSG(...) CAN_LOG(INFO, __VA_ARGS__)
+#else
 #	define MSG(...) printf (__VA_ARGS__)
+#	define MSG_DUMP_START()
+#	define MSG_DUMP_END()
+#	define MSG_DUMP(fm, ...) MSG(fm, ##__VA_ARGS__)
+#endif
 #endif
 
 /* Definition of MSG_ERR */

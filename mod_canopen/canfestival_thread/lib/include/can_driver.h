@@ -72,28 +72,32 @@ UNS8 DLL_CALL(canChangeBaudRate)(CAN_HANDLE, char *)FCT_PTR_INIT;
 #if defined DEBUG_MSG_CONSOLE_ON || defined NEED_PRINT_MESSAGE
 #include "def.h"
 
-#define _P(fc) case fc: MSG(#fc" ");break;
+#define _P(fc) case fc: MSG_DUMP(#fc" ");break;
 
 static inline void print_message(Message const *m)
 {
     int i;
     UNS8 fc;
-    MSG("id:%02x ", m->cob_id & 0x7F);
+    MSG_DUMP("id:%02x ", m->cob_id & 0x7F);
     fc = m->cob_id >> 7;
     switch(fc)
     {
         case SYNC:
-            if(m->cob_id == 0x080)
-                MSG("SYNC ");
-            else
-                MSG("EMCY ");
+            if(m->cob_id == 0x080) {
+				MSG_DUMP("SYNC ");
+			}
+            else {
+				MSG_DUMP("EMCY ");
+            }
         break;
 #ifdef CO_ENABLE_LSS
         case LSS:
-        	if(m->cob_id == 0x7E5)
-                MSG("MLSS ");
-            else
-                MSG("SLSS ");
+			if(m->cob_id == 0x7E5) {
+				MSG_DUMP("MLSS ");
+			}
+            else {
+				MSG_DUMP("SLSS ");
+            }
         break;
 #endif
         _P(TIME_STAMP)
@@ -133,11 +137,11 @@ static inline void print_message(Message const *m)
             _P(ABORT_TRANSFER_REQUEST)
         }
     }
-    MSG(" rtr:%d", m->rtr);
-    MSG(" len:%d", m->len);
+    MSG_DUMP(" rtr:%d", m->rtr);
+    MSG_DUMP(" len:%d", m->len);
     for (i = 0 ; i < m->len ; i++)
-        MSG(" %02x", m->data[i]);
-    MSG("\n");
+        MSG_DUMP(" %02x", m->data[i]);
+    MSG_DUMP("\n");
 }
 
 #endif

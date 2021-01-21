@@ -89,8 +89,10 @@ canReceive_driver (CAN_HANDLE fd0, Message * m)
   memcpy (m->data, frame.data, 8);
 
 #if defined DEBUG_MSG_CONSOLE_ON
-  MSG("in : ");
+  MSG_DUMP_START();
+  MSG_DUMP("in : ");
   print_message(m);
+  MSG_DUMP_END();
 #endif
   return 0;
 }
@@ -113,8 +115,10 @@ canSend_driver (CAN_HANDLE fd0, Message const * m)
     memcpy (frame.data, m->data, 8);
 
 #if defined DEBUG_MSG_CONSOLE_ON
-  MSG("out : ");
+  MSG_DUMP_START();
+  MSG_DUMP("out : ");
   print_message(m);
+  MSG_DUMP_END();
 #endif
 
   res = CAN_SEND (*(int *) fd0, &frame, sizeof (frame), 0);
@@ -204,7 +208,7 @@ canOpen_driver (s_BOARD * board)
 	       ifr.ifr_name, strerror (CAN_ERRNO (err)));
       goto error_close;
     }
-  
+
   {
     int loopback = 1;
     err = CAN_SETSOCKOPT(*(int *)fd0, SOL_CAN_RAW, CAN_RAW_LOOPBACK,
@@ -214,7 +218,7 @@ canOpen_driver (s_BOARD * board)
         goto error_close;
     }
   }
-  
+
 #ifndef RTCAN_SOCKET /*CAN_RAW_RECV_OWN_MSGS not supported in rtsocketcan*/
   {
     int recv_own_msgs = 0; /* 0 = disabled (default), 1 = enabled */
@@ -226,7 +230,7 @@ canOpen_driver (s_BOARD * board)
     }
   }
 #endif
-  
+
   addr.can_family = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
   err = CAN_BIND (*(int *) fd0, (struct sockaddr *) &addr, sizeof (addr));
