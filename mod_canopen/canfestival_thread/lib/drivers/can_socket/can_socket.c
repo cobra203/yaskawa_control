@@ -53,7 +53,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define AF_CAN PF_CAN
 #endif
 //#include "af_can.h"
+#ifdef	NON_VIRTAUL_CAN
 #define CAN_IFNAME     "can%s"
+#else
+#define CAN_IFNAME     "vcan%s"
+#endif
 #define CAN_SOCKET     socket
 #define CAN_CLOSE      close
 #define CAN_RECV       recv

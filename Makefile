@@ -43,7 +43,9 @@ CFLAGS += -Wall -O2 -fPIC -g -rdynamic
 SUBDIR := $(shell find $(patsubst %/,%,$(filter %/, $(obj-y))) -maxdepth 5 -type d)
 CFLAGS += $(foreach f, $(filter %/include, $(SUBDIR)), -I $(TOPDIR)/$(f))
 
-LDFLAGS += -lc
+ifeq ($(LDFLAGS),)
+LDFLAGS := -lpthread -lrt
+endif
 export CFLAGS LDFLAGS
 
 TARGET := cobra_gauguin
