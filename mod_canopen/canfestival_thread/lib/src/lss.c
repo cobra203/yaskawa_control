@@ -1,5 +1,5 @@
 /*
-This file is part of CanFestival, a library implementing CanOpen Stack. 
+This file is part of CanFestival, a library implementing CanOpen Stack.
 
 
 Copyright (C): Jorge Berzosa
@@ -40,6 +40,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "data.h"
 #include "canfestival.h"
 #include "sysdep.h"
+#include "objaccessinternal.h"
 
 #ifdef CO_ENABLE_LSS
 
@@ -75,7 +76,7 @@ void LssAlarmSDELAY(CO_Data* d, UNS32 id);
 #define StartLSS_MSG_TIMER(){\
  MSG_WAR(0x3D02, "StartLSS_MSG_TIMER",0);\
  d->lss_transfer.timerMSG = SetAlarm(d,0,&LssAlarmMSG,MS_TO_TIMEVAL(LSS_TIMEOUT_MS),0);}
- 
+
 #define StopLSS_SDELAY_TIMER(){\
  MSG_WAR(0x3D03, "StopLSS_SDELAY_TIMER", 0);\
  d->lss_transfer.timerSDELAY = DelAlarm(d->lss_transfer.timerSDELAY);}
@@ -100,7 +101,7 @@ void LssAlarmFS(CO_Data* d, UNS32 id);
 
 
 void LssAlarmMSG(CO_Data* d, UNS32 id)
-{	
+{
 	(void)id;
 	StopLSS_MSG_TIMER();
 #ifdef CO_ENABLE_LSS_FS
@@ -119,8 +120,8 @@ void LssAlarmMSG(CO_Data* d, UNS32 id)
    				sendMasterLSSMessage(d,LSS_IDENT_FASTSCAN,0,0);
    				return;
    			}
-   			else{ 
-   			
+			else{
+
     			d->lss_transfer.state = LSS_FINISHED;
     			/* Inform the application that there aren't not configured nodes in the net  */
     			d->lss_transfer.dat1=1;
@@ -149,25 +150,25 @@ void LssAlarmMSG(CO_Data* d, UNS32 id)
     	d->lss_transfer.FastScan_SM = LSS_FS_RESET;
 #endif
     }
-    	
+
     /* Call the user function to inform of the problem.*/
     if(d->lss_transfer.Callback){
 	   	/*If there is a callback, it is responsible of the error*/
     	(*d->lss_transfer.Callback)(d,d->lss_transfer.command);
     }
 }
-    
-    
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param id                                                                                       
-**/   
+
+
+/*!
+**
+**
+** @param d
+** @param id
+**/
 void LssAlarmSDELAY(CO_Data* d, UNS32 id)
-{	
+{
 	(void)id;
-	/* The first switch_delay period expired. Store the node state, change it 
+	/* The first switch_delay period expired. Store the node state, change it
  	 * so no CAN messages will be sent or received, call the ChangeBaudRate function*/
    	if(d->lss_transfer.switchDelayState==SDELAY_FIRST){
    		MSG_WAR(0x3D0B, "LSS switch delay first period expired",0);
@@ -179,7 +180,7 @@ void LssAlarmSDELAY(CO_Data* d, UNS32 id)
     	MSG_WAR(0x3D0C, "LSS switch delay second period expired",0);
     	d->lss_transfer.switchDelayState=SDELAY_OFF;
     	StopLSS_SDELAY_TIMER();
-    		
+
     	if (*(d->iam_a_slave))
     		d->canHandle=d->lss_transfer.canHandle_t;
     	else{
@@ -191,19 +192,19 @@ void LssAlarmSDELAY(CO_Data* d, UNS32 id)
     		}
     	}
     }
-} 
+}
 
 #ifdef CO_ENABLE_LSS_FS
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param id                                                                                       
-**/   
+/*!
+**
+**
+** @param d
+** @param id
+**/
 void LssAlarmFS(CO_Data* d, UNS32 id)
-{	
+{
 	StopLSS_FS_TIMER();
-		
+
 	switch(d->lss_transfer.FastScan_SM){
    	case LSS_FS_RESET:
    	{
@@ -219,7 +220,7 @@ void LssAlarmFS(CO_Data* d, UNS32 id)
 			Mask<<=d->lss_transfer.BitChecked;
 			d->lss_transfer.IDNumber|=Mask;
 		}
-		
+
 		if(d->lss_transfer.BitChecked==0){
 			/* We finished with the current LSS-ID[sub], confirm it */
 			d->lss_transfer.FastScan_SM=LSS_FS_CONFIRMATION;
@@ -239,7 +240,7 @@ void LssAlarmFS(CO_Data* d, UNS32 id)
 	{
 		if(d->lss_transfer.LSSanswer!=0){
 			d->lss_transfer.LSSanswer=0;
-			
+
 			if(d->lss_transfer.LSSSub==3){
 				/* The LSS FastScan protocol finished correctly. Restore the parameters */
 				d->lss_transfer.BitChecked=128;
@@ -247,7 +248,7 @@ void LssAlarmFS(CO_Data* d, UNS32 id)
 				d->lss_transfer.LSSSub=0;
 				d->lss_transfer.LSSNext=0;
    				d->lss_transfer.IDNumber=0;
-				
+
 				/* Inform the application that the FastScan finished correctly */
 				d->lss_transfer.state = LSS_FINISHED;
 				d->lss_transfer.dat1=0;
@@ -287,53 +288,53 @@ void LssAlarmFS(CO_Data* d, UNS32 id)
 }
 #endif
 
-	
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-**/ 
+
+/*!
+**
+**
+** @param d
+**/
 void startLSS(CO_Data* d)
 {
 	(void)d;
 	/*MSG_WAR(0x3D09, "LSS services started",0);*/
 }
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-**/   
+/*!
+**
+**
+** @param d
+**/
 void stopLSS(CO_Data* d)
 {
 	(void)d;
 	/*MSG_WAR(0x3D09, "LSS services stopped",0);*/
 }
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param cob_id                                                                                   
-**                                                                                                 
-** @return                                                                                         
-**/  
+/*!
+**
+**
+** @param d
+** @param cob_id
+**
+** @return
+**/
 UNS8 sendSlaveLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 {
   Message m;
   UNS8 i;
-  
+
   if (!d->CurrentCommunicationState.csLSS){
   	MSG_WAR(0x2D17, "unable to send the LSS message, not in the proper state =>", d->nodeState);
   	return 0xFF;
   }
-   
+
   for(i=1;i<8;i++)m.data[i]=0;
   m.len = 8;
   m.rtr = NOT_A_REQUEST;
   m.data[0]=command;
   m.cob_id=UNS16_LE(SLSS_ADRESS);
-  
+
   /* Tha data sent with the msg depends on the command */
   switch(command){
   case LSS_INQ_NODE_ID: /* Inquire Node-ID */
@@ -344,7 +345,7 @@ UNS8 sendSlaveLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
   case LSS_CONF_STORE: /* Store Configured Parameters */
   	m.data[1]=*(UNS8 *)dat1;
   	m.data[2]=*(UNS8 *)dat2;
-  	break; 
+	break;
   case LSS_INQ_VENDOR_ID: /* Inquire Identity Vendor-ID */
   case LSS_INQ_PRODUCT_CODE: /* Inquire Identity Product-Code */
   case LSS_INQ_REV_NUMBER: /* Inquire Identity Revision-Number */
@@ -362,10 +363,10 @@ UNS8 sendSlaveLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
   	MSG_ERR(0x1D18, "send Slave LSS command not implemented", command);
   	return 0xFF;
   }
-  
+
   return canSend(d->canHandle,&m);
 }
-			
+
 /* If a baud rate is not supported just comment the line. */
 static UNS8 CO_TranslateBaudRate(char* optarg){
 	if(!strcmp( optarg, "1M")) return 0x00;
@@ -380,28 +381,28 @@ static UNS8 CO_TranslateBaudRate(char* optarg){
 	return 0xFF;
 }
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param cob_id                                                                                   
-**                                                                                                 
-** @return                                                                                         
-**/  
+/*!
+**
+**
+** @param d
+** @param cob_id
+**
+** @return
+**/
 UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 {
   Message m;
   UNS8 i;
   UNS8 res;
   UNS8 hasResponse=0;
-   
+
   for(i=1;i<8;i++)m.data[i]=0;
   m.len = 8;
   m.rtr = NOT_A_REQUEST;
   m.data[0]=command;
   m.cob_id=UNS16_LE(MLSS_ADRESS);
-  
-  /* Tha data sent with the msg depends on the command */	
+
+  /* Tha data sent with the msg depends on the command */
   switch(command){
   case LSS_CONF_NODE_ID: /* Configure Node-ID */
   	hasResponse=1;
@@ -409,24 +410,24 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
   	m.data[1]=*(UNS8 *)dat1;
   	break;
   case LSS_CONF_BIT_TIMING: /* Configure Bit Timing Parameters */
-  	
+
   	m.data[1]=*(UNS8 *)dat1;
   	d->lss_transfer.baudRate=*(char **)dat2;
-  	
+
   	if((m.data[2]=CO_TranslateBaudRate(d->lss_transfer.baudRate))!=0xFF){
   		hasResponse=1;
-		break;	 
+		break;
   	}
-  		
+
 	MSG_ERR(0x1D19, "Master-> Baud rate not supported",0);
 	d->lss_transfer.dat1=0xFF;
-	
+
 	/* if bit timing is not supported comment the previous code and uncomment the following one*/
 	/*{
 		MSG_ERR(0x1D1A, "Master-> Bit timing not supported",0);
 		d->lss_transfer.dat1=0x01;
 	}*/
-	
+
 	d->lss_transfer.dat2=0;
  	/* If there is a callback, it is responsible of the error */
 	if(d->lss_transfer.Callback)
@@ -441,11 +442,11 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 		d->lss_transfer.switchDelayState=SDELAY_FIRST;
 		d->lss_transfer.canHandle_t=d->canHandle;
 		res=canSend(d->canHandle,&m);
-  		if(res==0){
+		if(res==0){
   			StartLSS_SDELAY_TIMER();
   			d->lss_transfer.state=LSS_TRANS_IN_PROGRESS;
   		}
-  		return res;	
+		return res;
 	}
 	else{
 		MSG_ERR(0x1D1B, "Master-> Baud rate not specified",0);
@@ -473,7 +474,7 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 	m.data[3]=(UNS8)(*(UNS32*)dat1>>16 & 0xFF);
 	m.data[4]=(UNS8)(*(UNS32*)dat1>>24 & 0xFF);
 	break;
-	
+
   case LSS_CONF_STORE: /* Store Configured Parameters */
   case LSS_IDENT_REMOTE_NON_CONF: /* LSS identify non-configured remote slave */
   case LSS_INQ_VENDOR_ID: /* Inquire Identity Vendor-ID */
@@ -494,12 +495,12 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 	  			/* Adjust BitChecked from 32-1 to 31-0 */
 	  			if(d->lss_transfer.lss_fs_transfer.FS_BitChecked[i]>0)d->lss_transfer.lss_fs_transfer.FS_BitChecked[i]--;
 	  		}
-	  		
+
 	  		d->lss_transfer.IDNumber=0;
 	  		d->lss_transfer.BitChecked=128;
 	  		d->lss_transfer.LSSSub=0;
 	  		d->lss_transfer.LSSNext=0;
-	  				
+
 	  		/* it will generate a response only if it is the start of the FastScan protocol*/
 	  		hasResponse=1;
 	  	}
@@ -516,7 +517,7 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
    	MSG_ERR(0x1D1C, "send Master LSS command not implemented", command);
   	return 0xFF;
   }
-	
+
   res=canSend(d->canHandle,&m);
   if(res==0 && hasResponse==1){
   	StartLSS_MSG_TIMER();
@@ -525,20 +526,20 @@ UNS8 sendMasterLSSMessage(CO_Data* d, UNS8 command,void *dat1,void *dat2)
   return res;
 }
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param cob_id                                                                                   
-**                                                                                                 
-** @return                                                                                         
-**/  
+/*!
+**
+**
+** @param d
+** @param cob_id
+**
+** @return
+**/
 UNS8 sendLSS(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 {
   UNS8 res=1;
-  
+
   /* Tha data sent with the msg depends on the command and if the sender is a master or a slave */
-  if (*(d->iam_a_slave)){ 
+  if (*(d->iam_a_slave)){
   	res = sendSlaveLSSMessage(d, command,dat1,dat2);
   }
   else {/* It is a Master */
@@ -548,29 +549,29 @@ UNS8 sendLSS(CO_Data* d, UNS8 command,void *dat1,void *dat2)
 }
 
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param m                                                                                        
-**                                                                                                 
-** @return                                                                                         
-**/ 
+/*!
+**
+**
+** @param d
+** @param m
+**
+** @return
+**/
 UNS8 proceedLSS_Master(CO_Data* d, Message* m )
-{ 
+{
 	UNS8 msg_cs;
 	UNS32 Dat1=0;
 	UNS8 Dat2=0;
-	
+
 	if(d->lss_transfer.state!=LSS_TRANS_IN_PROGRESS)
 	{
 		//MSG_WAR(0x3D0D, "MasterLSS proceedLSS; unexpected message arrived;command ", m->data[0]);
 		//return 0;
 		goto ErrorProcessMaster;
 	}
-	
+
  	MSG_WAR(0x3D1E, "MasterLSS proceedLSS; command ", m->data[0]);
-	
+
    	switch(msg_cs=m->data[0]){
    		case LSS_INQ_NODE_ID: /* Inquire Node-ID */
    			if(d->lss_transfer.command!=LSS_INQ_NODE_ID)goto ErrorProcessMaster;
@@ -621,38 +622,38 @@ UNS8 proceedLSS_Master(CO_Data* d, Message* m )
    			MSG_ERR(0x1D1F, "Master LSS command not implemented", msg_cs);
   			return 0xFF;
    	}
-	
+
 	StopLSS_MSG_TIMER();
     d->lss_transfer.state = LSS_FINISHED;
-    	
+
 	d->lss_transfer.dat1=Dat1;
 	d->lss_transfer.dat2=Dat2;
  	/* If there is a callback, it is responsible of the received response */
 	if(d->lss_transfer.Callback)
     	(*d->lss_transfer.Callback)(d,d->lss_transfer.command);
-    			
+
    return 0;
-   
+
 ErrorProcessMaster:
     MSG_WAR(0x3D20, "MasterLSS proceedLSS; unexpected message arrived;command ", m->data[0]);
 	return 0xFF;
-		
+
 }
 
-/*!                                                                                                
-**                                                                                                 
-**                                                                                                 
-** @param d                                                                                        
-** @param m                                                                                        
-**                                                                                                 
-** @return                                                                                         
-**/ 
+/*!
+**
+**
+** @param d
+** @param m
+**
+** @return
+**/
 UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
-{  
+{
 	UNS8 msg_cs;
-	
+
   	MSG_WAR(0x3D21, "SlaveLSS proceedLSS; command ", m->data[0]);
-  	
+
    	switch(msg_cs=m->data[0]){
    	case LSS_SM_GLOBAL:		/* Switch Mode Global */
    		/* if there is not a mode change break*/
@@ -660,7 +661,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
    			MSG_WAR(0x3D22, "SlaveLSS already in the mode ", m->data[1]);
    			break;
    		}
-   		
+
 		if(m->data[1]==LSS_CONFIGURATION_MODE)	{
 			MSG_WAR(0x3D23, "SlaveLSS switching to configuration mode ", 0);
 			/* Store the NodeId in case it will be changed */
@@ -669,7 +670,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 		}
 		else if(m->data[1]==LSS_WAITING_MODE){
 			MSG_WAR(0x3D24, "SlaveLSS switching to operational mode ", 0);
-			
+
 			/* If the nodeID has changed update it and put the node state to Initialisation. */
 			if(d->lss_transfer.nodeID!=getNodeId(d)){
 				if(getNodeId(d)==0xFF){/* The nodeID was 0xFF; initialize the application*/
@@ -684,10 +685,10 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 		}
 	break;
 	case LSS_CONF_NODE_ID: /* Configure Node-ID */
-	{ 
+	{
 		UNS8 error_code=0;
 		UNS8 spec_error=0;
-			
+
 		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE){
 			if(m->data[1]>127 && m->data[1]!=0xFF){
 				MSG_ERR(0x1D26, "NodeID out of range",0);
@@ -703,13 +704,13 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			break;
 		}
 		sendSlaveLSSMessage(d,msg_cs,&error_code,&spec_error);
-	}	
+	}
 	break;
 	case LSS_CONF_BIT_TIMING: /* Configure Bit Timing Parameters */
 	{
 		UNS8 error_code=0;
 		UNS8 spec_error=0;
-			
+
 		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE){
 			/* If a baud rate is not supported just comment the line. */
 			switch(m->data[2]){
@@ -725,7 +726,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			default:
 				MSG_ERR(0x1D28, "Baud rate not supported",0);
 				error_code=0xFF; /* Baud rate not supported*/
-				break; 		
+				break;
 			}
 		}
 		else{
@@ -733,23 +734,23 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			//error_code=0xFF;
 			break;
 		}
-		
+
 		/* if bit timing is not supported comment the previous code and uncomment the following */
 		/*{
 			MSG_ERR(0x1D29, "Bit timing not supported",0);
-			error_code=0x01; // bit timing not supported 
+			error_code=0x01; // bit timing not supported
 		}*/
-			
+
 		sendSlaveLSSMessage(d,msg_cs,&error_code,&spec_error);
 	}
 	break;
 	case LSS_CONF_ACT_BIT_TIMING: /* Activate Bit Timing Parameters */
-		
+
 		if(d->lss_transfer.mode!=LSS_CONFIGURATION_MODE){
 			MSG_ERR(0x3D2B, "SlaveLSS not in configuration mode",0);
 			break;
 		}
-		
+
 		if(strcmp(d->lss_transfer.baudRate,"none")){
 			d->lss_transfer.switchDelay=getLSSDelay(m);
 			MSG_WAR(0x3D2C, "Slave Switch Delay set to: ",d->lss_transfer.switchDelay);
@@ -765,8 +766,8 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 	{
 		UNS8 error_code=0;
 		UNS8 spec_error=0;
-		
-		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE){ 
+
+		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE){
 			if(d->lss_StoreConfiguration){
 				 /* call lss_StoreConfiguration with NodeId */
 	  			(*d->lss_StoreConfiguration)(d,&error_code,&spec_error);
@@ -774,7 +775,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			else{
 				MSG_ERR(0x1D2E, "Store configuration not supported",0);
 				error_code=1; /* store configuration is not supported */
-			}	
+			}
 		}
 		else{
 			MSG_WAR(0x3D2F, "SlaveLSS not in configuration mode",0);
@@ -793,22 +794,22 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
   		const CONSTSTORE indextable *ptrTable;
   		ODCallback_t *Callback;
   		UNS32 _SpecificNodeInfo;
-  
+
   		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE)
   		{
   			MSG_ERR(0x1D30, "Switch Mode Selective only supported in operational mode",0);
   			break;
   		}
-  			
+
 		_SpecificNodeInfo=getLSSIdent(m);
-				
+
 		ptrTable = (*d->scanIndexOD)(0x1018, &errorCode, &Callback);
 		if(_SpecificNodeInfo==READ_UNS32(ptrTable, 0, msg_cs-(LSS_SM_SELECTIVE_VENDOR-1))){
-			
+
 			d->lss_transfer.addr_sel_match|=(0x01<<(msg_cs-LSS_SM_SELECTIVE_VENDOR));
 			/* If all the fields has been set */
 			if(d->lss_transfer.addr_sel_match==0x0F){
-				
+
 				MSG_WAR(0x3D31, "SlaveLSS switching to configuration mode ", 0);
 				d->lss_transfer.addr_sel_match=0;
 				d->lss_transfer.nodeID=getNodeId(d);
@@ -816,12 +817,12 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 
 				sendSlaveLSSMessage(d,LSS_SM_SELECTIVE_RESP,0,0);
 			}
-		}	
+		}
 		else {
 			MSG_WAR(0x3D32, "LSS identity field doesn't match ", _SpecificNodeInfo);
 			d->lss_transfer.addr_sel_match=0;
-		}	
-	}	
+		}
+	}
 	break;
 	case LSS_IDENT_REMOTE_VENDOR: /* LSS Identify Remote Slaves */
 	case LSS_IDENT_REMOTE_PRODUCT:
@@ -834,19 +835,19 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
   		const CONSTSTORE indextable *ptrTable;
   		ODCallback_t *Callback;
   		UNS32 _SpecificNodeInfo;
-  		
+
 		_SpecificNodeInfo=getLSSIdent(m);
-		
+
 		ptrTable = (*d->scanIndexOD)(0x1018, &errorCode, &Callback);
-			
+
 		/* Check if the data match the identity object. */
 		switch(msg_cs){
-		case LSS_IDENT_REMOTE_VENDOR:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo == READ_UNS32(ptrTable, 0, 1)? d->lss_transfer.addr_ident_match|0x01:0;	break;
-		case LSS_IDENT_REMOTE_PRODUCT:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo == READ_UNS32(ptrTable, 0, 2)? d->lss_transfer.addr_ident_match|0x02:0;	break;
-		case LSS_IDENT_REMOTE_REV_LOW:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo <= READ_UNS32(ptrTable, 0, 3)? d->lss_transfer.addr_ident_match|0x04:0; break;
-		case LSS_IDENT_REMOTE_REV_HIGH:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo >= READ_UNS32(ptrTable, 0, 3)? d->lss_transfer.addr_ident_match|0x08:0;	break;
-		case LSS_IDENT_REMOTE_SERIAL_LOW:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo <= READ_UNS32(ptrTable, 0, 4)? d->lss_transfer.addr_ident_match|0x10:0;	break;
-		case LSS_IDENT_REMOTE_SERIAL_HIGH:d->lss_transfer.addr_ident_match=(_SpecificNodeInfo >= READ_UNS32(ptrTable, 0, 4)? d->lss_transfer.addr_ident_match|0x20:0;	break;
+		case LSS_IDENT_REMOTE_VENDOR:d->lss_transfer.addr_ident_match=_SpecificNodeInfo == READ_UNS32(ptrTable, 0, 1)? d->lss_transfer.addr_ident_match|0x01:0;	break;
+		case LSS_IDENT_REMOTE_PRODUCT:d->lss_transfer.addr_ident_match=_SpecificNodeInfo == READ_UNS32(ptrTable, 0, 2)? d->lss_transfer.addr_ident_match|0x02:0;	break;
+		case LSS_IDENT_REMOTE_REV_LOW:d->lss_transfer.addr_ident_match=_SpecificNodeInfo <= READ_UNS32(ptrTable, 0, 3)? d->lss_transfer.addr_ident_match|0x04:0; break;
+		case LSS_IDENT_REMOTE_REV_HIGH:d->lss_transfer.addr_ident_match=_SpecificNodeInfo >= READ_UNS32(ptrTable, 0, 3)? d->lss_transfer.addr_ident_match|0x08:0;	break;
+		case LSS_IDENT_REMOTE_SERIAL_LOW:d->lss_transfer.addr_ident_match=_SpecificNodeInfo <= READ_UNS32(ptrTable, 0, 4)? d->lss_transfer.addr_ident_match|0x10:0;	break;
+		case LSS_IDENT_REMOTE_SERIAL_HIGH:d->lss_transfer.addr_ident_match=_SpecificNodeInfo >= READ_UNS32(ptrTable, 0, 4)? d->lss_transfer.addr_ident_match|0x20:0;	break;
 		}
 		/* If all the fields has been set.. */
 		if(d->lss_transfer.addr_ident_match==0x3F){
@@ -861,7 +862,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 	break;
 	case LSS_IDENT_REMOTE_NON_CONF: /* LSS identify non-configured remote slave */
 	{
-		if(getNodeId(d)==0xFF){		
+		if(getNodeId(d)==0xFF){
 			MSG_WAR(0x3D35, "SlaveLSS non-configured ", 0);
 			sendSlaveLSSMessage(d,LSS_IDENT_NON_CONF_SLAVE,0,0);
 		}
@@ -876,16 +877,16 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 	case LSS_INQ_SERIAL_NUMBER: /* Inquire Identity Serial-Number */
 	if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE)
 	{
-	
+
 		UNS32 errorCode;
   		const CONSTSTORE indextable *ptrTable;
   		ODCallback_t *Callback;
   		UNS32 _SpecificNodeInfo;
-  
+
   		ptrTable = (*d->scanIndexOD)(0x1018, &errorCode, &Callback);
   		_SpecificNodeInfo=READ_UNS32(ptrTable, 0, msg_cs-(LSS_INQ_VENDOR_ID-1));
   		MSG_WAR(0x3D37, "SlaveLSS identity field inquired ", _SpecificNodeInfo);
-			
+
 		sendSlaveLSSMessage(d,msg_cs,&_SpecificNodeInfo,0);
 	}
 	break;
@@ -893,7 +894,7 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 		if(d->lss_transfer.mode==LSS_CONFIGURATION_MODE)
 		{
 			UNS8 NodeID;
-	
+
 			NodeID=getNodeId(d);
 			MSG_WAR(0x3D38, "SlaveLSS Node ID inquired ", NodeID);
 			sendSlaveLSSMessage(d,msg_cs,&NodeID,0);
@@ -908,21 +909,21 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 		/* If the nodeID isn't 0xFF the slave shall not participate  */
 		if(getNodeId(d)!=0xFF)break;
 		if(getLSSBitCheck(m)==128)d->lss_transfer.FastScan_SM=LSS_FS_RESET;
-		
+
    		switch(d->lss_transfer.FastScan_SM){
    		case LSS_FS_RESET:
    		{
    			UNS32 errorCode;
   			const CONSTSTORE indextable *ptrTable;
   			ODCallback_t *Callback;
-  				
+
 			MSG_WAR(0x3D3A, "SlaveLSS Reseting LSSPos", 0);
 			d->lss_transfer.LSSPos=0;
 			d->lss_transfer.FastScan_SM=LSS_FS_PROCESSING;
-			
+
   			ptrTable = (*d->scanIndexOD)(0x1018, &errorCode, &Callback);
   			d->lss_transfer.IDNumber=READ_UNS32(ptrTable, 0, d->lss_transfer.LSSPos+1);
-			
+
 			sendSlaveLSSMessage(d,LSS_IDENT_SLAVE,0,0);
    		}
 		break;
@@ -930,16 +931,16 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			if(d->lss_transfer.LSSPos==getLSSSub(m))
 			{
 				UNS32 Mask=0xFFFFFFFF<<getLSSBitCheck(m);
-				
+
 				MSG_WAR(0x3D3B, "SlaveLSS FastScan IDNumber", getLSSIdent(m));
 				MSG_WAR(0x3D3C, "SlaveLSS FastScan BitMask ", Mask);
 				MSG_WAR(0x3D3D, "SlaveLSS FastScan LSS-ID  ", d->lss_transfer.IDNumber);
-				
+
 				if((getLSSIdent(m) & Mask)==(d->lss_transfer.IDNumber & Mask))
 				{
 					sendSlaveLSSMessage(d,LSS_IDENT_SLAVE,0,0);
 				}
-				
+
 				if(getLSSBitCheck(m)==0)
 				{
 					d->lss_transfer.FastScan_SM=LSS_FS_CONFIRMATION;
@@ -961,32 +962,32 @@ UNS8 proceedLSS_Slave(CO_Data* d, Message* m )
 			   			d->lss_transfer.mode=LSS_CONFIGURATION_MODE;
 			    		d->lss_transfer.FastScan_SM=LSS_FS_RESET;
 			    		d->lss_transfer.LSSPos=0xFF;
-					}		
+					}
 					else
 					{
 						/* Switch to the next LSS-ID[sub] */
 						UNS32 errorCode;
   						const CONSTSTORE indextable *ptrTable;
   						ODCallback_t *Callback;
-		
+
 						d->lss_transfer.LSSPos=getLSSNext(m);
 						ptrTable = (*d->scanIndexOD)(0x1018, &errorCode, &Callback);
   						d->lss_transfer.IDNumber=READ_UNS32(ptrTable, 0, d->lss_transfer.LSSPos+1);
-						d->lss_transfer.FastScan_SM=LSS_FS_PROCESSING;						
+						d->lss_transfer.FastScan_SM=LSS_FS_PROCESSING;
 					}
 					sendSlaveLSSMessage(d,LSS_IDENT_SLAVE,0,0);
 				}
 			}
 			break;
 		}
-	}	
+	}
 	break;
 #endif
    	default:
    		MSG_ERR(0x1D40, "SlaveLSS command not implemented", msg_cs);
   		return 0xFF;
    	}
-   
+
     return 0;
 }
 
@@ -1000,15 +1001,15 @@ UNS8 configNetworkNode (CO_Data* d, UNS8 command, void *dat1, void* dat2, LSSCal
 	//d->lss_transfer.state=LSS_TRANS_IN_PROGRESS;
 	d->lss_transfer.Callback=Callback;
 	d->lss_transfer.command=command;
-	
+
 	StopLSS_MSG_TIMER();
   	//StartLSS_MSG_TIMER();
-  	
+
 	return sendMasterLSSMessage(d,command,dat1,dat2);
 }
 
 UNS8 getConfigResultNetworkNode (CO_Data* d, UNS8 command, UNS32* dat1, UNS8* dat2)
-{ 
+{
   (void)command;
   *dat1=d->lss_transfer.dat1;
   *dat2=d->lss_transfer.dat2;
