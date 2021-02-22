@@ -189,7 +189,6 @@ static int console_recv_callback(void *arg)
 	}
 
 	if(3 == key_value) {
-		console("\n%sQuit\n", CONSOLE_TAG);
 		return 1;
 	}
 
@@ -197,8 +196,9 @@ static int console_recv_callback(void *arg)
 
 	return 0;
 }
-EPOLL_CREATE_SIMPLE("console_recv_epoll", CONSOLE_FD, console_recv_callback);
+EPOLL_CREATE_SIMPLE(console_recv, CONSOLE_FD, console_recv_callback);
 
+#if 0
 /*===================================================================================*/
 /* For console shortcut define                                                      */
 /*===================================================================================*/
@@ -214,6 +214,7 @@ static void console_f1_f4_callback(void *data)
 	}
 }
 SHORTCUT_CREATE(KEY_COM_NULL, KEY_FUNC_F1, KEY_FUNC_F4, console_f1_f4_callback);
+#endif
 #endif
 
 /*===================================================================================*/
@@ -275,8 +276,9 @@ void cobra_console_cmd_register(COBRA_CMD_S *cmd)
 void cobra_console_deinit(void)
 {
 #if COBRA_CMD_ENABLE
-	epoll_bind_deregister(&gl_console.epoll, &epoll_console_recv_callback);
+	epoll_bind_deregister(&gl_console.epoll, &epoll_console_recv);
 	cobra_keyboard_bind(&gl_console.keyboard, CBA_DISABLE);
+	console("\n%sQuit\n", CONSOLE_TAG);
 #endif
 }
 
@@ -291,7 +293,7 @@ int cobra_console_init(void)
 	console("+====================================================================+\r\n");
 
 #if COBRA_CMD_ENABLE
-	epoll_bind_register(&gl_console.epoll, &epoll_console_recv_callback, EP_TYPE_IN);
+	epoll_bind_register(&gl_console.epoll, &epoll_console_recv, EP_TYPE_IN);
 
 	cobra_keyboard_bind(&gl_console.keyboard, CBA_ENABLE);
 	gl_console.keyboard->key_backspace_callback = _console_cmdline_backspace;
@@ -300,7 +302,7 @@ int cobra_console_init(void)
 	gl_console.keyboard->key_normol_callback = _console_cmdline_normal;
 	gl_console.keyboard->key_arrow_callback = _console_cmdline_arrow;
 
-	cobra_keyboard_shortcut_register(&shortcut_console_f1_f4_callback);
+	//cobra_keyboard_shortcut_register(&shortcut_console_f1_f4_callback);
 
 	cobra_cmd_init(&gl_console.cmd_head);
 #if COBRA_LIST_CMD_ENABLE

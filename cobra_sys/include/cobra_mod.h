@@ -9,14 +9,16 @@
 
 typedef struct mod_status_s
 {
-	struct canopen_status_s	*canopen;
+	struct gauguin_status_s	*gauguin;
+	struct socket_status_s *socket;
 } MOD_STATUS_S;
 
 typedef struct cobra_mod_s
 {
 	MOD_STATUS_S			status;
 
-	struct mod_canopen_s	*canopen;
+	struct mod_gauguin_s	*gauguin;
+	struct mod_socket_s		*socket;
 } COBRA_MOD_S;
 
 #if COBRA_CMD_ENABLE

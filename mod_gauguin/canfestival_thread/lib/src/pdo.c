@@ -186,7 +186,7 @@ proceedPDO (CO_Data * d, Message * m)
   numPdo = 0;
   numMap = 0;
   if ((*m).rtr == NOT_A_REQUEST)
-    { 
+    {
       offsetObjdict = d->firstIndex->PDO_RCV;
       lastIndex = d->lastIndex->PDO_RCV;
 
@@ -220,7 +220,7 @@ proceedPDO (CO_Data * d, Message * m)
                 offsetObjdict = d->firstIndex->PDO_RCV_MAP;
                 lastIndex = d->lastIndex->PDO_RCV_MAP;
                 numMap = 0;
-                while (numMap < READ_UNS8(d->objdict, offsetObjdict, 0))
+                while (numMap < READ_UNS8(d->objdict, offsetObjdict + numPdo, 0))
                   {
                     UNS8 tmp[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
                     UNS32 ByteSize;
@@ -242,7 +242,7 @@ proceedPDO (CO_Data * d, Message * m)
 
                     Size = (UNS8) (mappingParameter & (UNS32) 0x000000FF);
 
-                    /* set variable only if Size != 0 and 
+                    /* set variable only if Size != 0 and
                      * Size is lower than remaining bits in the PDO */
                     if (Size && ((offset + Size) <= (m->len << 3)))
                       {
@@ -366,7 +366,7 @@ proceedPDO (CO_Data * d, Message * m)
                       DelAlarm (d->PDO_status[numPdo].inhibit_timer);
                     d->PDO_status[numPdo].transmit_type_parameter &=
                       ~PDO_INHIBITED;
-                    /* Call  PDOEventTimerAlarm for this TPDO, 
+                    /* Call  PDOEventTimerAlarm for this TPDO,
                      * this will trigger emission et reset timers */
                     PDOEventTimerAlarm (d, numPdo);
                     return 0;
@@ -508,9 +508,9 @@ sendOnePDOevent (CO_Data * d, UNS8 pdoNum)
     {
       return 0;
     }
- 
+
   MSG_WAR (0x3968, "  PDO is on EVENT. Trans type : ", READ_UNS8(d->objdict, offsetObjdict, 2));
-  
+
   memset(&pdo, 0, sizeof(pdo));
   if (buildPDO (d, pdoNum, &pdo))
     {
@@ -527,6 +527,7 @@ sendOnePDOevent (CO_Data * d, UNS8 pdoNum)
     )
     {
       /* No changes -> go to next pdo */
+	  MSG_WAR (0x3968, "No changes -> go to next pdo", 0);
       return 0;
     }
   else

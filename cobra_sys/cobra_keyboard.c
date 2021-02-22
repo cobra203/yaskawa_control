@@ -75,14 +75,17 @@ static void spec_key_process(uint8_t com_index, uint8_t key_index)
 	if(KEY_COM_NULL != com_index) {
 		if(key_index > KEY_GROUP_NORMAL) {
 			key_value = key_index - KEY_GROUP_NORMAL - 1;
-			console("[%s-%c]", gl_keys_table[com_index].str, key_value < 33 ? key_value - 1 + 'A' : key_value);
+			KEYBOARD_LOG(INFO, "Shortcut key [%s-%c] : Undefined\n",
+				gl_keys_table[com_index].str, key_value < 33 ? key_value - 1 + 'A' : key_value);
 		}
 		else {
-			console("[%s-%s]", gl_keys_table[com_index].str, gl_keys_table[key_index].str);
+			KEYBOARD_LOG(INFO, "Shortcut key [%s-%s] : Undefined\n",
+				gl_keys_table[com_index].str, gl_keys_table[key_index].str);
 		}
 	}
 	else {
-		console("[%s]", gl_keys_table[key_index].str);
+		KEYBOARD_LOG(INFO, "Shortcut key [%s] : Undefined\n",
+			gl_keys_table[key_index].str);
 	}
 }
 

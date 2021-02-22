@@ -1,5 +1,5 @@
 /*
-This file is part of CanFestival, a library implementing CanOpen Stack. 
+This file is part of CanFestival, a library implementing CanOpen Stack.
 
 Copyright (C): Edouard TISSERANT and Francis DUPIN
 
@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define OD_VALUE_RANGE_EXCEEDED      0x06090030 /* Value range test result */
 #define OD_VALUE_TOO_LOW             0x06090031 /* Value range test result */
 #define OD_VALUE_TOO_HIGH            0x06090032 /* Value range test result */
-/* Others SDO abort codes 
+/* Others SDO abort codes
  */
 #define SDOABT_TOGGLE_NOT_ALTERNED   0x05030000
 #define SDOABT_TIMED_OUT             0x05040000
@@ -47,7 +47,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define SDOABT_INVALID_BLOCK_SIZE    0x05040002
 #define SDOABT_OUT_OF_MEMORY         0x05040005 /* Size data exceed SDO_MAX_LENGTH_TRANSFER */
 #define SDOABT_GENERAL_ERROR         0x08000000 /* Error size of SDO message */
-#define SDOABT_LOCAL_CTRL_ERROR      0x08000021 
+#define SDOABT_LOCAL_CTRL_ERROR      0x08000021
 
 /******************** CONSTANTS ****************/
 
@@ -69,16 +69,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef FALSE
 #define FALSE 0
 #endif
-    
+
 /** Status of the SDO transmission
  */
 #define SDO_RESET                0x0      /* Transmission not started. Init state. */
-#define SDO_FINISHED             0x1      /* data are available */                          
+#define SDO_FINISHED             0x1      /* data are available */
 #define	SDO_ABORTED_RCV          0x80     /* Received an abort message. Data not available */
 #define	SDO_ABORTED_INTERNAL     0x85     /* Aborted but not because of an abort message. */
-#define	SDO_DOWNLOAD_IN_PROGRESS 0x2 
-#define	SDO_UPLOAD_IN_PROGRESS   0x3   
-#define	SDO_BLOCK_DOWNLOAD_IN_PROGRESS 0x4 
+#define	SDO_DOWNLOAD_IN_PROGRESS 0x2
+#define	SDO_UPLOAD_IN_PROGRESS   0x3
+#define	SDO_BLOCK_DOWNLOAD_IN_PROGRESS 0x4
 #define	SDO_BLOCK_UPLOAD_IN_PROGRESS   0x5
 
 /** getReadResultNetworkDict may return any of above status value or this one
@@ -88,7 +88,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 /* Status of the node during the SDO transfer : */
 #define SDO_SERVER  0x1
 #define SDO_CLIENT  0x2
-#define SDO_UNKNOWN 0x3             
+#define SDO_UNKNOWN 0x3
 
 /* SDOrx ccs: client command specifier */
 #define DOWNLOAD_SEGMENT_REQUEST     0
@@ -127,9 +127,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define SDO_BSS_END_DOWNLOAD_RESPONSE      1
 #define SDO_BSS_DOWNLOAD_RESPONSE          2
 
-/*  Function Codes 
+/*  Function Codes
    ---------------
-  defined in the canopen DS301 
+  defined in the canopen DS301
 */
 #define NMT	   0x0
 #define SYNC       0x1
@@ -159,9 +159,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 /** Status of the LSS transmission
  */
 #define LSS_RESET                0x0      /* Transmission not started. Init state. */
-#define LSS_FINISHED             0x1      /* data are available */                          
+#define LSS_FINISHED             0x1      /* data are available */
 #define	LSS_ABORTED_INTERNAL     0x2     /* Aborted but not because of an abort message. */
-#define	LSS_TRANS_IN_PROGRESS 	 0x3    
+#define	LSS_TRANS_IN_PROGRESS 	 0x3
 
 /* constantes used in the different state machines */
 /* ----------------------------------------------- */

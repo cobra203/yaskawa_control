@@ -36,7 +36,7 @@ TOPDIR := $(shell pwd)
 export TOPDIR
 
 obj-y += cobra_sys/
-obj-y += mod_canopen/
+obj-y += mod_gauguin/
 
 CFLAGS += -Wall -O2 -fPIC -g -rdynamic
 

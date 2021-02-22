@@ -15,6 +15,7 @@ typedef enum epoll_type_e
 {
 	EP_TYPE_IN,
 	EP_TYPE_OUT,
+	EP_TYPE_IO,
 } EPOLL_TYPE_E;
 
 typedef struct cobra_epoll_s
@@ -22,22 +23,23 @@ typedef struct cobra_epoll_s
 	char		*name;
 	int			fd;
 	struct		epoll_event ev;
+	struct		epoll_event ev_callbak;
 	void		*data;
 	int			(*callback)		(void *);
 	LIST_S		list;
 } COBRA_EPOLL_S;
 
 #define EPOLL_CREATE(NAME, FD, CALLBACK, DATA) \
-struct cobra_epoll_s epoll_##CALLBACK = { \
-	.name = (NAME), \
+struct cobra_epoll_s epoll_##NAME = { \
+	.name = #NAME, \
 	.fd = (FD), \
 	.callback = CALLBACK, \
 	.data = (void *)(DATA), \
 }
 
 #define EPOLL_CREATE_SIMPLE(NAME, FD, CALLBACK) \
-struct cobra_epoll_s epoll_##CALLBACK = { \
-	.name = NAME, \
+struct cobra_epoll_s epoll_##NAME = { \
+	.name = #NAME, \
 	.fd = (FD), \
 	.callback = CALLBACK, \
 }

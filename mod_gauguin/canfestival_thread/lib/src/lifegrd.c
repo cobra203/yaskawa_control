@@ -305,6 +305,7 @@ void heartbeatInit(CO_Data* d)
   for( index = (UNS8)0x00; index < *d->ConsumerHeartbeatCount; index++ )
     {
       TIMEVAL time = (UNS16) ( (d->ConsumerHeartbeatEntries[index]) & (UNS32)0x0000FFFF ) ;
+	  MSG_WAR(0x0, "heartbeatInit time: ", (UNS16)time);
       if ( time )
         {
           d->ConsumerHeartBeatTimers[index] = SetAlarm(d, index, &ConsumerHeartbeatAlarm, MS_TO_TIMEVAL(time), 0);
@@ -330,7 +331,7 @@ void nodeguardInit(CO_Data* d)
 
     TIMEVAL time = *d->GuardTime;
     d->GuardTimeTimer = SetAlarm(d, 0, &GuardTimeAlarm, MS_TO_TIMEVAL(time), MS_TO_TIMEVAL(time));
-    MSG_WAR(0x0, "GuardTime: ", time);
+    MSG_WAR(0x0, "GuardTime: ", (UNS16)time);
 
     for (i = 0; i < NMT_MAX_NODE_ID; i++) {
       /** Set initial value for the nodes */

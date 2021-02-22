@@ -41,7 +41,7 @@
 #define BIT_CLR(a, s)   ((a) = (a) & ~(0x1 << (s)))
 
 #define CBA_SUCCESS     0
-#define CBA_FAILURE     -1
+#define CBA_FAILURE     (-1)
 
 #define CBA_TRUE        1
 #define CBA_FALSE       0
